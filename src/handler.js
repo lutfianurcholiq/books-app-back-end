@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const books = require('./book')
 const { nanoid } = require('nanoid')
 
@@ -190,7 +191,41 @@ const deleteBookById = (request, h) => {
 }
 
 const getAllSearchBook = (request, h) => {
-  // const { name, reading, finished } = request.query
+  const { name, reading, finished } = request.query
+
+  let filterBook = [...books]
+
+  if (name) {
+    const bookName = name.toLowerCase()
+    filterBook = filterBook.filter((book) => book.name.toLowerCase().includes(bookName))
+  }
+
+  if (reading !== null) {
+    const read = reading === 1
+    filterBook = filterBook.filter((book) => book.reading === read)
+  }
+
+  if (finished !== null) {
+    const finish = finished === 1
+    filterBook = filterBook.filter((book) => book.finished === finish)
+  }
+
+  const bookMap = books.map((book) => ({
+    id: book.id,
+    name: book.name,
+    publisher: book.publisher
+  }))
+
+  const response = h.response(
+    {
+      status: 'success',
+      data: {
+        books: bookMap
+      }
+    }
+  )
+  response.code(200)
+  return response
 }
 
 module.exports = { addBook, getAllBook, getBookById, editBookById, deleteBookById, getAllSearchBook }
